@@ -3,10 +3,26 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTableS",
+						"type": "DatasetReference"
+					},
+					"name": "SourceDB"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTableD",
+						"type": "DatasetReference"
+					},
+					"name": "DestinationDB"
+				}
+			],
 			"transformations": [],
-			"script": "\n"
+			"script": "\n\nsource(output(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDB\nSourceDB sink(input(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp,\n\t\tpop_sum as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table') ~> DestinationDB"
 		}
 	}
 }
