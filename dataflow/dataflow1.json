@@ -21,8 +21,12 @@
 					"name": "DestinationDB"
 				}
 			],
-			"transformations": [],
-			"script": "\n\nsource(output(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDB\nSourceDB sink(input(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp,\n\t\tpop_sum as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table') ~> DestinationDB"
+			"transformations": [
+				{
+					"name": "SumPopulation"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SourceDB\nSourceDB aggregate(groupBy(ProvinceID),\n\tpop_sum = sum(Population),\n\t\teach(match(name != 'ProvinceID'), $$ = first($$))) ~> SumPopulation\nSumPopulation sink(input(\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as integer,\n\t\tPopulation as long,\n\t\tModifiedDate as timestamp,\n\t\tpop_sum as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tmapColumn(\n\t\tCityName,\n\t\tProvinceID,\n\t\tPopulation,\n\t\tModifiedDate,\n\t\tpop_sum\n\t)) ~> DestinationDB"
 		}
 	}
 }
