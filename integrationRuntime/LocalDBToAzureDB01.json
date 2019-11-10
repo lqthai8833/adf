@@ -1,0 +1,6 @@
+{
+	"name": "LocalDBToAzureDB01",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
