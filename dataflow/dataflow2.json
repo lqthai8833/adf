@@ -1,0 +1,16 @@
+{
+	"name": "dataflow2",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "MovieDBSource"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"script": "\n\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> MovieDBSource"
+		}
+	}
+}
