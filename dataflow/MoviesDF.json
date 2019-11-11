@@ -1,0 +1,39 @@
+{
+	"name": "MoviesDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MoviesDBSource",
+						"type": "DatasetReference"
+					},
+					"name": "Movies"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "MoviesBellow6CSV",
+						"type": "DatasetReference"
+					},
+					"name": "RateBelow6"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "RateBellow6"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies split(toInteger(Rating) < 6,\n\tdisjoint: false) ~> RateBellow6@(Rating, Others)\nRateBellow6@Rating sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> RateBelow6\nRateBellow6@Others sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> sink1"
+		}
+	}
+}
