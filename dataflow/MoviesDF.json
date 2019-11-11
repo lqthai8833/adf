@@ -31,9 +31,12 @@
 			"transformations": [
 				{
 					"name": "RateBellow6"
+				},
+				{
+					"name": "CleanData"
 				}
 			],
-			"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies split(toInteger(Rating) < 6,\n\tdisjoint: false) ~> RateBellow6@(Rating, Others)\nRateBellow6@Rating sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MoviesWithRateBelow6'],\n\tpartitionBy('hash', 1)) ~> RateBelow6\nRateBellow6@Others sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> sink1"
+			"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies split(toInteger(Rating) < 6,\n\tdisjoint: false) ~> RateBellow6@(Rating, Others)\nRateBellow6@Rating derive(Rating = toInteger(Rating),\n\t\teach(match(startsWith(name, 'title')), 'updated_title' = 'movie-'+toString($$))) ~> CleanData\nCleanData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MoviesWithRateBelow6'],\n\tmapColumn(\n\t\tmovie,\n\t\ttitle,\n\t\tgenres,\n\t\tyear,\n\t\tRating,\n\t\t{Rotton Tomato},\n\t\tupdated_title\n\t),\n\tpartitionBy('hash', 1)) ~> RateBelow6\nRateBellow6@Others sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> sink1"
 		}
 	}
 }
