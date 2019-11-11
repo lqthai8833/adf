@@ -242,6 +242,59 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MoviesDBStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "MoviesDB2.csv",
+						"container": "thaicontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "movie",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "genres",
+						"type": "String"
+					},
+					{
+						"name": "year",
+						"type": "String"
+					},
+					{
+						"name": "Rating",
+						"type": "String"
+					},
+					{
+						"name": "Rotton Tomato",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/MoviesDBStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MoviesBellow6CSV')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -342,6 +395,54 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/MovieDF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MoviesDBSource",
+								"type": "DatasetReference"
+							},
+							"name": "Movies1",
+							"typeProperties": {}
+						},
+						{
+							"dataset": {
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference"
+							},
+							"name": "Movies2",
+							"typeProperties": {}
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "MoviesBellow6CSV",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Join1"
+						}
+					],
+					"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies1\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies2\nMovies1, Movies2 join(Movies1@movie == Movies2@movie,\n\tjoinType:'inner',\n\tbroadcast: 'none')~> Join1\nJoin1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MoviesJoinData'],\n\tmapColumn(\n\t\tmovie_1 = Movies1@movie,\n\t\tmovie_2 = Movies2@movie,\n\t\ttitle = Movies2@title,\n\t\tgenres = Movies2@genres,\n\t\tyear = Movies2@year,\n\t\tRating = Movies2@Rating,\n\t\t{Rotton Tomato} = Movies2@{Rotton Tomato}\n\t),\n\tpartitionBy('hash', 1)) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MoviesDBSource')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText2')]",
+				"[concat(variables('factoryId'), '/datasets/MoviesBellow6CSV')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/MoviesDF')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -382,7 +483,7 @@
 							"name": "CleanData"
 						}
 					],
-					"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies split(toInteger(Rating) < 6,\n\tdisjoint: false) ~> RateBellow6@(Rating, Others)\nRateBellow6@Rating derive(Rating = toInteger(Rating),\n\t\teach(match(startsWith(name, 'title')), 'updated_title' = 'movie-'+toString($$))) ~> CleanData\nCleanData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MoviesWithRateBelow6'],\n\tmapColumn(\n\t\tmovie,\n\t\ttitle,\n\t\tgenres,\n\t\tyear,\n\t\tRating,\n\t\t{Rotton Tomato},\n\t\tupdated_title\n\t),\n\tpartitionBy('hash', 1)) ~> RateBelow6\nRateBellow6@Others sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> sink1"
+					"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\ttitle as string,\n\t\tgenres as string,\n\t\tyear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies split(toInteger(Rating) < 6,\n\tdisjoint: false) ~> RateBellow6@(Rating, Others)\nRateBellow6@Rating derive(Rating = toInteger(Rating),\n\t\teach(match(startsWith(name,'title')), 'updated_title' = 'movie-'+toString($$))) ~> CleanData\nCleanData sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['MoviesWithRateBelow6'],\n\tmapColumn(\n\t\tmovie,\n\t\ttitle,\n\t\tgenres,\n\t\tyear,\n\t\tRating,\n\t\t{Rotton Tomato},\n\t\tupdated_title\n\t),\n\tpartitionBy('hash', 1)) ~> RateBelow6\nRateBellow6@Others sink(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> sink1"
 				}
 			},
 			"dependsOn": [
@@ -508,6 +609,45 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/MoviesDF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "MovieDF1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "MovieDF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Movies1": {},
+									"Movies2": {},
+									"sink1": {}
+								}
+							},
+							"staging": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/MovieDF')]"
 			]
 		}
 	]
