@@ -1,0 +1,6 @@
+{
+	"name": "integrationRuntimeDBOnPremises",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
