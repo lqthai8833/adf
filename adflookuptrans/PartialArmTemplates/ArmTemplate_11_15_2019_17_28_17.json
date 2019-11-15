@@ -1,0 +1,165 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adflookuptrans"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/lookuptransDF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CitiesDS",
+								"type": "DatasetReference"
+							},
+							"name": "Cities"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressesCSV",
+								"type": "DatasetReference"
+							},
+							"name": "Addresses"
+						},
+						{
+							"dataset": {
+								"referenceName": "ProvincesCSV",
+								"type": "DatasetReference"
+							},
+							"name": "Provinces"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "FinalResults_NotMatch",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						},
+						{
+							"dataset": {
+								"referenceName": "FinalResultsDS",
+								"type": "DatasetReference"
+							},
+							"name": "sink3"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference"
+							},
+							"name": "sink4"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AddressesCities"
+						},
+						{
+							"name": "CheckMatch"
+						},
+						{
+							"name": "LookupProvinces"
+						},
+						{
+							"name": "CheckMatch02"
+						},
+						{
+							"name": "IsMatch02"
+						},
+						{
+							"name": "DerivedColumn1"
+						},
+						{
+							"name": "ProvincesF"
+						},
+						{
+							"name": "Select2"
+						},
+						{
+							"name": "Select3"
+						}
+					],
+					"script": "\n\nsource(output(\n\t\tCityID as string,\n\t\tCityName as string,\n\t\tProvinceID as string,\n\t\tPopulation as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Cities\nsource(output(\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCityID as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Addresses\nsource(output(\n\t\tProvinceID as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as string,\n\t\tPopulation as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Provinces\nAddresses, Cities lookup(Addresses@CityID == Cities@CityID,\n\tbroadcast: 'none')~> AddressesCities\nAddressesCities derive(match = isMatch()) ~> CheckMatch\nDerivedColumn1, ProvincesF lookup(DerivedColumn1@ProvinceID == ProvincesF@ProvinceID,\n\tbroadcast: 'none')~> LookupProvinces\nLookupProvinces derive(matchToProvince = isMatch(),\n\t\tinserteddate = currentDate()) ~> CheckMatch02\nSelect2 split(matchToProvince,\n\tdisjoint: false) ~> IsMatch02@(IsMatch, NotMatch)\nSelect3 derive(ProvinceID = toInteger(ProvinceID)) ~> DerivedColumn1\nProvinces derive(ProvinceID = toInteger(ProvinceID)) ~> ProvincesF\nCheckMatch02 select(mapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID = CityID_Address,\n\t\tPostalCode,\n\t\tCityName,\n\t\tPopulation = Provinces@Population,\n\t\tmatch,\n\t\tProvinceCode,\n\t\tProvinceName,\n\t\tCountryID,\n\t\tPopulation = Provinces@Population,\n\t\tmatchToProvince,\n\t\tinserteddate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select2\nCheckMatch select(mapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCityID_Address = Addresses@CityID,\n\t\tPostalCode,\n\t\tModifiedDate = Addresses@ModifiedDate,\n\t\tCityID_City = Cities@CityID,\n\t\tCityName,\n\t\tProvinceID,\n\t\tPopulation,\n\t\tModifiedDate = Cities@ModifiedDate,\n\t\tmatch\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select3\nIsMatch02@NotMatch sink(input(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tACityID as integer,\n\t\tPostalCode as string,\n\t\tCityName as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as integer,\n\t\tPopulation as long,\n\t\tInsertedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID,\n\t\tPostalCode,\n\t\tCityName,\n\t\tProvinceCode,\n\t\tProvinceName,\n\t\tCountryID,\n\t\tPopulation,\n\t\tInsertedDate = inserteddate\n\t)) ~> sink2\nIsMatch02@IsMatch sink(input(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tACityID as integer,\n\t\tPostalCode as string,\n\t\tCityName as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as integer,\n\t\tPopulation as long,\n\t\tInsertedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID,\n\t\tPostalCode,\n\t\tCityName,\n\t\tProvinceCode,\n\t\tProvinceName,\n\t\tCountryID,\n\t\tPopulation,\n\t\tInsertedDate = inserteddate\n\t)) ~> sink3\nSelect3 sink(input(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tACityID as integer,\n\t\tPostalCode as string,\n\t\tCityID as integer,\n\t\tCityName as string,\n\t\tProvinceID as string,\n\t\tPopulation as long\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID = CityID_Address,\n\t\tPostalCode,\n\t\tCityName,\n\t\tProvinceID,\n\t\tPopulation\n\t)) ~> sink4"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ACityID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CityID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CityName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProvinceID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Population",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Address_City"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

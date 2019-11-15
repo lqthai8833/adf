@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adflookuptrans"
+		},
+		"ADFStorage_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDB_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabaseD_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabaseS_connectionString": {
+			"value": ""
+		},
+		"LocalDBToAzureDB_connectionString": {
+			"value": ""
+		}
+	}
+}
