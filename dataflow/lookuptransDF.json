@@ -1,0 +1,77 @@
+{
+	"name": "lookuptransDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CitiesDS",
+						"type": "DatasetReference"
+					},
+					"name": "Cities"
+				},
+				{
+					"dataset": {
+						"referenceName": "AddressesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "Addresses"
+				},
+				{
+					"dataset": {
+						"referenceName": "ProvincesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "Provinces"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "FinalResults_NotMatch",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "FinalResultsDS",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddressesCities"
+				},
+				{
+					"name": "CheckMatch"
+				},
+				{
+					"name": "ConditionalSplit1"
+				},
+				{
+					"name": "Select1"
+				},
+				{
+					"name": "LookupProvinces"
+				},
+				{
+					"name": "CheckMatch02"
+				},
+				{
+					"name": "IsMatch02"
+				},
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "ProvincesF"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tCityID as string,\n\t\tCityName as string,\n\t\tProvinceID as string,\n\t\tPopulation as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Cities\nsource(output(\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCityID as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Addresses\nsource(output(\n\t\tProvinceID as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as string,\n\t\tPopulation as string,\n\t\tModifiedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> Provinces\nAddresses, Cities lookup(Addresses@CityID == Cities@CityID,\n\tbroadcast: 'none')~> AddressesCities\nAddressesCities derive(match = isMatch()) ~> CheckMatch\nSelect1 split(match,\n\tdisjoint: true) ~> ConditionalSplit1@(IsMatch)\nCheckMatch select(mapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID = Addresses@CityID,\n\t\tPostalCode,\n\t\tCityID = Cities@CityID,\n\t\tCityName,\n\t\tProvinceID,\n\t\tPopulation,\n\t\tmatch\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Select1\nDerivedColumn1, ProvincesF lookup(DerivedColumn1@ProvinceID == ProvincesF@ProvinceID,\n\tbroadcast: 'none')~> LookupProvinces\nLookupProvinces derive(matchToProvince = isMatch(),\n\t\tinserteddate = currentDate()) ~> CheckMatch02\nCheckMatch02 split(matchToProvince,\n\tdisjoint: true) ~> IsMatch02@(IsMatch, NotMatch)\nConditionalSplit1@IsMatch derive(ProvinceID = toInteger(ProvinceID)) ~> DerivedColumn1\nProvinces derive(ProvinceID = toInteger(ProvinceID)) ~> ProvincesF\nIsMatch02@NotMatch sink(input(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tACityID as integer,\n\t\tPostalCode as string,\n\t\tCityName as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as integer,\n\t\tPopulation as long,\n\t\tInsertedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID,\n\t\tPostalCode,\n\t\tCityName,\n\t\tProvinceCode,\n\t\tProvinceName,\n\t\tCountryID,\n\t\tPopulation = IsMatch02@NotMatch@Population,\n\t\tInsertedDate = inserteddate\n\t)) ~> sink2\nIsMatch02@IsMatch sink(input(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tACityID as integer,\n\t\tPostalCode as string,\n\t\tCityName as string,\n\t\tProvinceCode as string,\n\t\tProvinceName as string,\n\t\tCountryID as integer,\n\t\tPopulation as long,\n\t\tInsertedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tACityID,\n\t\tPostalCode,\n\t\tCityName,\n\t\tProvinceCode,\n\t\tProvinceName,\n\t\tCountryID,\n\t\tPopulation = IsMatch02@IsMatch@Population,\n\t\tInsertedDate = inserteddate\n\t)) ~> sink3"
+		}
+	}
+}

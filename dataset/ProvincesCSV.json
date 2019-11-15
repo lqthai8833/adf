@@ -1,0 +1,48 @@
+{
+	"name": "ProvincesCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADFStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Provinces.csv",
+				"container": "adfcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ProvinceID",
+				"type": "String"
+			},
+			{
+				"name": "ProvinceCode",
+				"type": "String"
+			},
+			{
+				"name": "ProvinceName",
+				"type": "String"
+			},
+			{
+				"name": "CountryID",
+				"type": "String"
+			},
+			{
+				"name": "Population",
+				"type": "String"
+			},
+			{
+				"name": "ModifiedDate",
+				"type": "String"
+			}
+		]
+	}
+}
