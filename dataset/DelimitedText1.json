@@ -14,11 +14,11 @@
 					"value": "@item().name",
 					"type": "Expression"
 				},
-				"folderPath": "source",
 				"container": "thaicontainer"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []
