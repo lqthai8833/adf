@@ -11,13 +11,13 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": {
-					"value": "@concat('Cloned_', item().name, '.csv')",
+					"value": "@concat(item().name,'abc')",
 					"type": "Expression"
 				},
 				"folderPath": "output",
 				"container": "thaicontainer"
 			},
-			"columnDelimiter": "|",
+			"columnDelimiter": ",",
 			"escapeChar": "\\",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
