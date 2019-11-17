@@ -16,6 +16,9 @@
 		},
 		"AzureSqlDatabase2_connectionString": {
 			"value": ""
+		},
+		"AzureSqlDatabaseInputParam_connectionString": {
+			"value": ""
 		}
 	}
 }
