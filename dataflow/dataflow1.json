@@ -12,9 +12,17 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_Sale",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [],
-			"script": "\n\nsource(output(\n\t\tCategoryID as integer,\n\t\tCategoryName as string,\n\t\tSubcategoryName as string,\n\t\tProductSubcategoryID as integer,\n\t\tDepartmentName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1"
+			"script": "\n\nsource(output(\n\t\tCategoryID as integer,\n\t\tCategoryName as string,\n\t\tSubcategoryName as string,\n\t\tProductSubcategoryID as integer,\n\t\tDepartmentName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nsource1 sink(input(\n\t\tCategoryID as integer,\n\t\tCategoryName as string,\n\t\tSubcategoryName as string,\n\t\tProductSubcategoryID as integer,\n\t\tDepartmentName as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table') ~> sink1"
 		}
 	}
 }

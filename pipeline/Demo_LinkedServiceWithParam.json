@@ -17,7 +17,21 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "dataflow1",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"db_name": "DBParameter",
+								"server_name": "dbserver03.database.windows.net",
+								"schema_name": "dbo",
+								"table_name": "Sales"
+							},
+							"sink1": {
+								"db_name": "TestDB",
+								"server_name": "dbserver03.database.windows.net",
+								"schema_name": "dbo",
+								"table_name": "Sales"
+							}
+						}
 					}
 				}
 			}

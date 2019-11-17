@@ -1,0 +1,12 @@
+{
+	"name": "AzureSqlTable_ProductCategories01",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabaseInputParam",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
