@@ -85,7 +85,13 @@
 							"outputs": [
 								{
 									"referenceName": "AzureSqlTable_Sale",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"db_name": "DBParameter",
+										"server_name": "dbserver03.database.windows.net",
+										"schema_name": "dbo",
+										"table_name": "ac"
+									}
 								}
 							]
 						},
