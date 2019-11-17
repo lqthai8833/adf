@@ -88,6 +88,49 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Stored ProcedureUpdateDetails",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyDataFromAzureSQL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[UpdateProcessingDetails]",
+								"storedProcedureParameters": {
+									"Duration": {
+										"value": {
+											"value": "@activity('CopyDataFromAzureSQL').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"ProductCategory": {
+										"value": {
+											"value": "@item().Category",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
