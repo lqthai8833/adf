@@ -1,0 +1,17 @@
+{
+	"name": "AzureSqlDatabaseInputParam",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"DBName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "integrated security=False;encrypt=True;connection timeout=30;data source=dbserver03.database.windows.net;initial catalog=@{linkedService().DBName};user id=thai",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFERlRVVE9SSUFMMDNfOTE1MmNkMTktZmQzMC00ZTQ1LTg3MjQtNGM5M2FhN2E2MTFiIg0KfQ=="
+		}
+	}
+}
