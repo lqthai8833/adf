@@ -5,8 +5,28 @@
 			"referenceName": "AzureSqlDatabaseInputParam",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"DBName": "TestDB",
-				"DBServerName": "dbserver03.database.windows.net"
+				"DBName": {
+					"value": "@dataset().db_name",
+					"type": "Expression"
+				},
+				"DBServerName": {
+					"value": "@dataset().server_name",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"db_name": {
+				"type": "string"
+			},
+			"server_name": {
+				"type": "string"
+			},
+			"schema_name": {
+				"type": "string"
+			},
+			"table_name": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -36,8 +56,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "dbo",
-			"table": "Sales"
+			"schema": {
+				"value": "@dataset().schema_name",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().table_name",
+				"type": "Expression"
+			}
 		}
 	}
 }
