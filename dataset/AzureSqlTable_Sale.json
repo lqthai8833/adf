@@ -2,8 +2,12 @@
 	"name": "AzureSqlTable_Sale",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureSqlDatabase1",
-			"type": "LinkedServiceReference"
+			"referenceName": "AzureSqlDatabaseInputParam",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"DBName": "TestDB",
+				"DBServerName": "dbserver03.database.windows.net"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
