@@ -5,19 +5,13 @@
 		"factoryName": {
 			"value": "adftutorial03"
 		},
+		"AzureBlobStorage_connectionString": {
+			"value": ""
+		},
 		"AzureBlobStorage1_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabaseD_connectionString": {
-			"value": ""
-		},
-		"AzureSqlDatabaseS_connectionString": {
-			"value": ""
-		},
-		"LocalDBToAzureDB_connectionString": {
-			"value": ""
-		},
-		"MoviesDBStorage_connectionString": {
+		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
 		"containerUri": {

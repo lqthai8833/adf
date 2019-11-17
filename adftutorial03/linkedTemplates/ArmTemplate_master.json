@@ -7,25 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adftutorial03"
 		},
+		"AzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		},
 		"AzureBlobStorage1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
 		},
-		"AzureSqlDatabaseD_connectionString": {
+		"AzureSqlDatabase1_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseD'"
-		},
-		"AzureSqlDatabaseS_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseS'"
-		},
-		"LocalDBToAzureDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LocalDBToAzureDB'"
-		},
-		"MoviesDBStorage_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'MoviesDBStorage'"
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
 		},
 		"containerUri": {
 			"type": "string",
@@ -54,20 +46,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureBlobStorage_connectionString": {
+						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					},
 					"AzureBlobStorage1_connectionString": {
 						"value": "[parameters('AzureBlobStorage1_connectionString')]"
 					},
-					"AzureSqlDatabaseD_connectionString": {
-						"value": "[parameters('AzureSqlDatabaseD_connectionString')]"
-					},
-					"AzureSqlDatabaseS_connectionString": {
-						"value": "[parameters('AzureSqlDatabaseS_connectionString')]"
-					},
-					"MoviesDBStorage_connectionString": {
-						"value": "[parameters('MoviesDBStorage_connectionString')]"
-					},
-					"LocalDBToAzureDB_connectionString": {
-						"value": "[parameters('LocalDBToAzureDB_connectionString')]"
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
 					}
 				}
 			},
