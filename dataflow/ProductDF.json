@@ -1,0 +1,27 @@
+{
+	"name": "ProductDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_Product",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "PivotProduct"
+				},
+				{
+					"name": "DerivedColumn1"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tProductID as string,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(10,0),\n\t\tListPrice as string,\n\t\tSize as string,\n\t\tWeight as string,\n\t\tProductCategoryID as string,\n\t\tProductModelID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> source1\nDerivedColumn1 pivot(groupBy(Size),\n\tpivotBy(Color),\n\tavg = avg(StandardCost),\n\tcolumnNaming: '$N_$V_calculated',\n\tlateral: true) ~> PivotProduct\nsource1 derive(Size = iif(isNull(Size)||Size == 'NULL', 'NA', Size),\n\t\tColor = iif(isNull(Color)||Color == 'NULL', 'NA', Color)) ~> DerivedColumn1"
+		}
+	}
+}
