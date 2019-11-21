@@ -1,0 +1,24 @@
+{
+	"name": "RuleBaseMappingDF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_MoviesDB",
+						"type": "DatasetReference"
+					},
+					"name": "moviesDB"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "MapCanonicalModel"
+				}
+			],
+			"script": "\n\nsource(output(\n\t\tmovie as string,\n\t\tTitle as string,\n\t\tgenresgenresgenres as string,\n\t\tYear as string,\n\t\tRating as string,\n\t\t{Rotton Tomato} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> moviesDB\nmoviesDB select(mapColumn(\n\t\teach(match(locate('title',lower(name)) != 0),\n\t\t\t'title' = $$),\n\t\teach(match(locate('genres',lower(name)) != 0),\n\t\t\t'genres' = $$),\n\t\teach(match(locate('rating',lower(name)) != 0),\n\t\t\t'rating' = $$),\n\t\teach(match(locate('year',lower(name)) != 0),\n\t\t\t'year' = $$)\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> MapCanonicalModel"
+		}
+	}
+}
