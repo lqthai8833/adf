@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "incre_data.csv",
 				"folderPath": "output/incremental",
 				"container": "adfcontainer"
 			},
