@@ -8,16 +8,28 @@
 		"AzureBlobStorage_connectionString": {
 			"value": ""
 		},
-		"AzureBlobStorage1_connectionString": {
+		"AzureBlobStorage01_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage2_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage3_connectionString": {
 			"value": ""
 		},
 		"AzureSqlDatabase1_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabase2_connectionString": {
+		"AzureSqlDatabaseD_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabaseInputParam_connectionString": {
+		"AzureSqlDatabaseS_connectionString": {
+			"value": ""
+		},
+		"LocalDBToAzureDB_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage4_connectionString": {
 			"value": ""
 		},
 		"containerUri": {
