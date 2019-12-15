@@ -13,7 +13,7 @@
 				"fileName": "SGIP_NETMAST_EDB_INVOICE.TXT",
 				"container": "adfcontainer"
 			},
-			"columnDelimiter": "",
+			"columnDelimiter": ",",
 			"escapeChar": "\\",
 			"quoteChar": ""
 		},
