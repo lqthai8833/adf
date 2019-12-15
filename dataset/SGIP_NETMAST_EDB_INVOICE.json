@@ -1,0 +1,22 @@
+{
+	"name": "SGIP_NETMAST_EDB_INVOICE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage5",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "SGIP_NETMAST_EDB_INVOICE.TXT",
+				"container": "adfcontainer"
+			},
+			"columnDelimiter": "",
+			"escapeChar": "\\",
+			"quoteChar": ""
+		},
+		"schema": []
+	}
+}
